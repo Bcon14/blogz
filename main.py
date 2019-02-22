@@ -6,7 +6,7 @@ app.config['DEBUG'] = True
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://blogz:password@localhost:8889/blogz'
 app.config['SQLALCHEMY_ECHO'] = True
 db = SQLAlchemy(app)
-app.secret_key = 'y337kGcys&zP3B'
+app.secret_key = 'ys&zP3B'
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -17,7 +17,6 @@ class User(db.Model):
     def __init__(self, username, password):
         self.username = username
         self.password = password
-        
 
     def __repr__(self):
         return '<Username %r>' % self.username
@@ -53,6 +52,11 @@ def signup():
             flash('Requires a password')
         if verify == '':
             flash('Requires a verify password')
+        if username.length() < 4:
+            flash('Invalid username')  
+        if password.length() < 4:
+            flash('Invalid password')  
+
         
         if password == verify:
             existing_user = User.query.filter_by(username=username).first()
@@ -101,30 +105,33 @@ def blog():
 
 @app.route('/newpost', methods=['GET', 'POST'])
 def newpost():
-    username = request.form['username']
-    password = request.form['password']
-    owner = User.query.filter_by(username=username).first()
-
-    return render_template('add_blog_form.html')
+        return render_template('add_blog_form.html')
 
 
 @app.route('/blog_post', methods=['POST'])
 def blog_post():
-    
+    owner = User.query.filter_by(owner=session['username']).first()
     if request.method == 'POST':
         blog_title = request.form['blog_title']
         blog_body = request.form['blog_body']
         if blog_title == '' or blog_body == '':
             return redirect('/newpost')
         else:
-            new_blog = Blog(blog_title , blog_body, )
+            new_blog = Blog(blog_title , blog_body, owner)
             db.session.add(new_blog)
             db.session.commit()
             return render_template('/blog_post.html', title=blog_title, body=blog_body)
         
 @app.route('/', methods=['POST'])
 def index():
-    return render_template('index.html')
+    users = User.query.all()
+    user_id = request.args.get('id')
+    if not user_id:
+        return render_template('index.html', users=users)
+    else:
+        user = User.query.get(user_id)
+        blogs = Blog.query.filter_by(user=user)
+        return render_template('index.html', blogs=blogs, user=user)
 
 
 if __name__ == '__main__':
