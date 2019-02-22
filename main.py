@@ -74,8 +74,8 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        username = User.query.filter_by(username=username).first()
-        if username and username.password == password:
+        user = User.query.filter_by(username=username).first()
+        if username and user.password == password:
             session['username'] = username
             flash('Logged in')
             return redirect('/newpost')
