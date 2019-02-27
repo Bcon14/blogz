@@ -102,7 +102,7 @@ def blog():
     blogs = Blog.query.all()
     blog_id = request.args.get('id')
     if not blog_id:
-        return render_template('blog.html',blogs = blogs)
+        return render_template('blog.html',blogs=blogs, owner=owner_of_blog, user=user_id)
     else:
         blog = Blog.query.get(blog_id)
         blog_title = blog.title

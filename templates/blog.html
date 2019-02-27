@@ -16,7 +16,10 @@
                 <h2><a href='http://localhost:5000/blog?id={{blog.id}}'>{{blog.title}}</a></h2>
             <br>
                 {{blog.body}}
-                
+            <br>
+            <p>
+                Written by:<a href='http://localhost:5000/blog?user={{user.id}}'>{{owner}}</a>
+            </p>
             </li>
             {% endfor %}
         </ul>
